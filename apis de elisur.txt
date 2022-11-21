@@ -1,0 +1,1321 @@
+// Importando los paquetes necesarios para el proyecto.
+  
+const mysql = require('mysql');
+const express = require('express');
+const bodyParser = require('body-parser');
+const { application, query } = require('express');
+var app = express();
+
+// Decodificar un formulario.
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+app.use(express.json());
+
+// Credenciales de la base de datos. 
+var mysqlConnection = mysql.createConnection({  
+    host: 'localhost',
+    port:  '3306',  
+    user : 'root',  
+    password : '',   
+    database : 'elisur',  
+    multipleStatements : true  
+});  
+  
+// Conexion a la base de datos  
+mysqlConnection.connect((err) => {  
+    if(!err) {  
+        console.log("Se conectó a la base de datos correctamente");  
+    }  
+    else{  
+        console.log("No se puede conectar \n Error :" + JSON.stringify(err,undefined,2));  
+    }  
+});  
+
+// Ejecutar el servidor con número de puerto 
+app.listen(process.env.PORT||3000,() => {
+  console.log("El servidor express está corriendo en el puerto : 3000");
+});
+
+
+
+
+/*------------------------APIS---------------------------------------------*/
+
+
+
+
+
+/*--------------------------------Roles---------------------------------*/
+
+// Ver Roles 
+app.get('/roles', (req, res) => {
+  mysqlConnection.query('CALL PROCE_ROLES_SELECT',(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+
+//VER UN ROL
+
+app.get('/ROL', (req, res) => {
+  const {  COD_ROL } = req.body; 
+  const query = `CALL PROCE_ROLES_SELECT_UNO(?); `; 
+  mysqlConnection.query(query, [COD_ROL],(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+// INSERTAR roles 
+app.post('/roles', (req, res) => {
+  const { COD_ROL } = req.params;
+  const {NOMBRE_ROL, FECHA_REGISTRO,ESTADO_ROL} = req.body;
+  console.log(req.body);
+  const query = `
+  CALL PROCE_ROLES_INSERT(?);
+  `;
+  mysqlConnection.query(query, [NOMBRE_ROL, FECHA_REGISTRO, ESTADO_ROL], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'ROL CREADO'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+//actualizo un ROL 
+app.post('/roles/:COD_ROL',(req,res)=>{  
+  let COD_ROL = req.body.COD_ROL; 
+  let NOMBRE_ROL = req.body.NOMBRE_ROL;  
+  let ESTADO_ROL = req.body.ESTADO_ROL; 
+ mysqlConnection.query(`CALL PROCE_ROL_UPDATE(?,?,?);`,[COD_ROL, NOMBRE_ROL, ESTADO_ROL],(err,rows,fields)=>{  
+  if(!err)   
+  res.send("Datos actualizados correctamente"),
+  console.log(rows);
+  else  
+      console.log(err);  
+})  
+});
+
+//ELIIMINAR ROLES 
+
+app.delete('/roles',(req,res)=>{  
+  let emp=req.body;
+  var sql= "SET @COD_ROL = ?;\
+  CALL PROCE_ROL_DELETE(@COD_ROL);"
+  mysqlConnection.query(sql,[emp.COD_ROL],(err,rows,fields)=>{
+  if(!err)
+  res.send("ROL DESACTIVADO");
+  else console.log(err);    
+  })
+  });
+
+
+
+/*--------------------------------Servicios---------------------------------*/
+
+// Ver servicios
+app.get('/servicios', (req, res) => {
+  mysqlConnection.query('CALL PROCE_SERVICIOS_SELECT',(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+//VER UN SERVICIO
+
+app.get('/SERVICIO', (req, res) => {
+  const {  COD_SERVICIO } = req.body; 
+  const query = `CALL PROCE_SERVICIOS_SELECT_UNO(?); `; 
+  mysqlConnection.query(query, [COD_SERVICIO],(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+// INSERTAR servicios 
+app.post('/servicios/insert', (req, res) => {
+  const {NOMBRE_SERVICIO, PRECIO_SERVICIO} = req.body;
+  console.log(req.body);
+  const query = `
+  CALL PROCE_SERVICIOS_INSERT(?, ?);
+  `;
+  mysqlConnection.query(query, [NOMBRE_SERVICIO, PRECIO_SERVICIO], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'Articulo Creado'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+//actualizo un Servicio //ESTE SI FUNCIONA
+app.post('/servicios/:COD_SERVICIO',(req,res)=>{  
+  let COD_SERVICIO = req.body.COD_SERVICIO; 
+  let NOMBRE_SERVICIO = req.body.NOMBRE_SERVICIO;  
+  let PRECIO_SERVICIO = req.body.PRECIO_SERVICIO; 
+  let ESTADO_SERVICIO = req.body.ESTADO_SERVICIO;  
+ mysqlConnection.query(`CALL PROCE_SERVICIOS_UPDATE(?,?,?,?);`,[COD_SERVICIO, NOMBRE_SERVICIO, PRECIO_SERVICIO, ESTADO_SERVICIO],(err,rows,fields)=>{  
+  if(!err)   
+  res.send("Datos actualizados correctamente"),
+  console.log(rows);
+  else  
+      console.log(err);  
+})  
+});
+
+//ELIIMINAR SERVICIOS
+
+app.delete('/servicios/:ELIMINAR',(req,res)=>{  
+  let emp=req.body;
+  var sql= "SET @COD_SERVICIO = ?;\
+  CALL PROCE_SERVICIOS_DELETE(@COD_SERVICIO);"
+  mysqlConnection.query(sql,[emp.COD_SERVICIO],(err,rows,fields)=>{
+  if(!err)
+  res.send("SERVICIO DESACTIVADO");
+  else console.log(err);    
+  })
+  });
+
+
+
+/*--------------------------------SOLICITUDES---------------------------------*/
+
+// VER Solicitudes
+app.get('/solicitudes', (req, res) => {
+  mysqlConnection.query('CALL PROCE_SOLICITUDES_SELECT',(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+//VER UNA SOLICITUD
+
+app.get('/SOLICITUD', (req, res) => {
+  const {  COD_SOLICITUD } = req.body; 
+  const query = `CALL PROCE_SOLICITUDES_SELECT_UNO(?); `; 
+  mysqlConnection.query(query, [COD_SOLICITUD],(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+//Insert solicitudes
+
+app.post('/solicitudes', (req, res) => {
+  const {NOMBRE_SOLICITANTE, TELEFONO, CORREO_ELECTRONICO, TIPO_SOLICITANTE, TELEFONO_OPCIONAL, DIRECCION_SOLICITANTE, CIUDAD, COD_SERVICIO, DESCRIPCION_SOLICITUD} = req.body;
+  console.log(req.body);
+  const query = `
+  CALL PROCE_SOLICITUDES_INSERT(?, ?, ?, ?, ?, ?, ?, ?, ?);
+  `;
+  mysqlConnection.query(query, [NOMBRE_SOLICITANTE, TELEFONO, CORREO_ELECTRONICO, TIPO_SOLICITANTE, TELEFONO_OPCIONAL, DIRECCION_SOLICITANTE, CIUDAD, COD_SERVICIO, DESCRIPCION_SOLICITUD], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'solicitud Creada'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+//actualizar Solicitudes
+app.post('/solicitudes/:COD_SOLICITUD',(req,res)=>{  
+  let COD_SOLICITUD = req.body.COD_SOLICITUD; 
+  let NOMBRE_SOLICITANTE = req.body.NOMBRE_SOLICITANTE;  
+  let TELEFONO = req.body.TELEFONO;  
+  let CORREO_ELECTRONICO = req.body.CORREO_ELECTRONICO;  
+  let TIPO_SOLICITANTE = req.body.TIPO_SOLICITANTE;  
+  let TELEFONO_OPCIONAL = req.body.TELEFONO_OPCIONAL;  
+  let DIRECCION_SOLICITANTE = req.body.DIRECCION_SOLICITANTE;  
+  let CIUDAD = req.body.CIUDAD;  
+  let COD_SERVICIO = req.body.COD_SERVICIO;  
+  let DESCRIPCION_SOLICITUD = req.body.DESCRIPCION_SOLICITUD;  
+  let COD_ESTADO = req.body.COD_ESTADO; 
+ mysqlConnection.query(`CALL PROCE_SOLICITUDES_UPDATE(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,[COD_SOLICITUD,NOMBRE_SOLICITANTE, TELEFONO, CORREO_ELECTRONICO, TIPO_SOLICITANTE, TELEFONO_OPCIONAL, DIRECCION_SOLICITANTE, CIUDAD, COD_SERVICIO, DESCRIPCION_SOLICITUD,COD_ESTADO],(err,rows,fields)=>{  
+  if(!err)   
+  res.send("Datos actualizados correctamente"),
+  console.log(rows);
+  else  
+      console.log(err);  
+})  
+});
+
+//ELIIMINAR SERVICIOS
+
+app.delete('/solicitud/:COD_SOLICITUD',(req,res)=>{  
+  let emp=req.body;
+  var sql= "SET @COD_SOLICITUD = ?;\
+  CALL PROCE_SOLICITUDES_DELETE(@COD_SOLICITUD);"
+  mysqlConnection.query(sql,[emp.COD_SOLICITUD],(err,rows,fields)=>{
+  if(!err)
+  res.send("SOLICITUD DESACTIVADA");
+  else console.log(err);    
+  })
+  });
+
+
+
+  /*--------------------------------USUARIOS---------------------------------*/
+
+// VER Usuarios
+app.get('/usuarios', (req, res) => {
+  mysqlConnection.query('CALL PROCE_USUARIOS_SELECT',(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+//VER UN usuario
+
+app.get('/USUARIO', (req, res) => {
+  const {  COD_USUARIO } = req.body; 
+  const query = `CALL PROCE_USUARIOS_SELECT_UNO(?); `; 
+  mysqlConnection.query(query, [COD_USUARIO],(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+//Insert USUARIOS
+
+app.post('/usuarios', (req, res) => {
+  const {NOMBRE_USUARIO, CORREO_USUARIO, PASSWORD_USUARIO, COD_ROL} = req.body;
+  console.log(req.body);
+  const query = `
+  CALL PROCE_USUARIOS_INSERT(?, ?, ?, ?);
+  `;
+  mysqlConnection.query(query, [NOMBRE_USUARIO, CORREO_USUARIO, PASSWORD_USUARIO, COD_ROL], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'usuario Creado'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+//actualizar USUARIOS
+app.post('/usuarios/:COD_USUARIO',(req,res)=>{  
+  let COD_USUARIO = req.body.COD_USUARIO; 
+  let NOMBRE_USUARIO = req.body.NOMBRE_USUARIO;  
+  let CORREO_USUARIO = req.body.CORREO_USUARIO;  
+  let PASSWORD_USUARIO = req.body.PASSWORD_USUARIO;  
+  let COD_ROL = req.body.COD_ROL; 
+ mysqlConnection.query(`CALL PROCE_USUARIOS_UPDATE(?, ?, ?, ?, ?);`,[COD_USUARIO,NOMBRE_USUARIO,CORREO_USUARIO, PASSWORD_USUARIO, COD_ROL],(err,rows,fields)=>{  
+  if(!err)   
+  res.send("Datos actualizados correctamente"),
+  console.log(rows);
+  else  
+      console.log(err);  
+})  
+});
+
+//ELIIMINAR USUARIOS
+
+app.delete('/usuarios/:COD_USUARIO',(req,res)=>{  
+  let emp=req.body;
+  var sql= "SET @COD_USUARIO = ?;\
+  CALL PROCE_USUARIOS_DELETE(@COD_USUARIO);"
+  mysqlConnection.query(sql,[emp.COD_USUARIO],(err,rows,fields)=>{
+  if(!err)
+  res.send("USUARIO DESACTIVADO");
+  else console.log(err);    
+  })
+  });
+
+
+    /*--------------------------------Tipo de Clientes---------------------------------*/
+
+// VER Tipos de cliente
+app.get('/tipoClientes', (req, res) => {
+  mysqlConnection.query('CALL PROCE_TIPOS_CLIENTE_SELECT',(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+
+//VER un Tipo de cliente
+
+app.get('/tipoclienteUNO', (req, res) => {
+  const {  COD_TIPO_CLIENTE } = req.body; 
+  const query = `CALL PROCE_TIPOS_CLIENTE_SELECT_UNO(?); `; 
+  mysqlConnection.query(query, [COD_TIPO_CLIENTE],(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+//Insert Tipo de cliente
+
+app.post('/tipocl/insert', (req, res) => {
+  const { NOMBRE_TIPO_CLIENTE } = req.params;
+  console.log(req.body);
+  const query = `
+  CALL PROCE_TIPOS_CLIENTE_INSERT(?);
+  `;
+  mysqlConnection.query(query, [NOMBRE_TIPO_CLIENTE], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'tipo cliente CREADO'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+//actualizar Tipos de CLiente
+app.post('/tipoclientes/:COD_TIPO_CLIENTE',(req,res)=>{  
+  let COD_TIPO_CLIENTE = req.body.COD_TIPO_CLIENTE; 
+  let NOMBRE_TIPO_CLIENTE = req.body.NOMBRE_TIPO_CLIENTE;  
+  let ESTADO = req.body.ESTADO;  
+ mysqlConnection.query(`CALL PROCE_TIPOS_CLIENTE_UPDATE(?, ?, ?);`,[COD_TIPO_CLIENTE,NOMBRE_TIPO_CLIENTE, ESTADO],(err,rows,fields)=>{  
+  if(!err)   
+  res.send("Datos actualizados correctamente"),
+  console.log(rows);
+  else  
+      console.log(err);  
+})  
+});
+
+
+//ELIIMINAR Tipos de cliente
+app.delete('/tipo/:COD_TIPO_CLIENTE',(req,res)=>{  
+  let emp=req.body;
+  var sql= "SET @COD_TIPO_CLIENTE = ?;\
+  CALL PROCE_TIPOS_CLIENTE_DELETE(@COD_TIPO_CLIENTE);"
+  mysqlConnection.query(sql,[emp.COD_TIPO_CLIENTE],(err,rows,fields)=>{
+  if(!err)
+  res.send("Tipo de CLiente DESACTIVADO");
+  else console.log(err);    
+  })
+  });
+
+
+/*--------------------------------Reporte de fallas---------------------------------*/
+
+// VER Reporte de fallas
+app.get('/fallas', (req, res) => {
+  mysqlConnection.query('CALL PROCE_REPORTE_FALLAS_SELECT',(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+//VER UNA FALLA
+
+app.get('/FALLA', (req, res) => {
+  const {  COD_REPORTE_FALLA } = req.body; 
+  const query = `CALL PROCE_REPORTE_FALLAS_SELECT_UNO(?); `; 
+  mysqlConnection.query(query, [COD_REPORTE_FALLA],(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+//Insert Fallas
+
+app.post('/falla/insert', (req, res) => {
+  const { COD_REPORTE_FALLA } = req.params;
+  const {COD_SERVICIO, NOMBRE, TELEFONO, CORREO_ELECTRONICO, TEMA, DESCRIPCION, UBICACION} = req.body;
+  console.log(req.body);
+  const query = `
+  CALL PROCE_REPORTE_FALLAS_INSERT(?, ?, ?, ?, ?, ?, ?);
+  `;
+  mysqlConnection.query(query, [COD_SERVICIO, NOMBRE, TELEFONO, CORREO_ELECTRONICO, TEMA, DESCRIPCION, UBICACION], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'Reporte Creado'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+//actualizar REPORTE DE FALLAS
+app.post('/FALLA/:COD_FALLA',(req,res)=>{  
+  let COD_REPORTE_FALLA = req.body.COD_REPORTE_FALLA; 
+  let COD_SERVICIO = req.body.COD_SERVICIO;  
+  let NOMBRE = req.body.NOMBRE;  
+  let TELEFONO = req.body.TELEFONO;  
+  let CORREO_ELECTRONICO = req.body.CORREO_ELECTRONICO;  
+  let TEMA = req.body.TEMA;  
+  let DESCRIPCION = req.body.DESCRIPCION;  
+  let UBICACION = req.body.UBICACION;   
+  let COD_ESTADO = req.body.COD_ESTADO; 
+ mysqlConnection.query(`CALL PROCE_REPORTE_FALLAS_UPDATE(?, ?, ?, ?, ?, ?, ?, ?, ?);`,[COD_REPORTE_FALLA,COD_SERVICIO, NOMBRE, TELEFONO, CORREO_ELECTRONICO, TEMA, DESCRIPCION, UBICACION, COD_ESTADO],(err,rows,fields)=>{  
+  if(!err)   
+  res.send("Datos actualizados correctamente"),
+  console.log(rows);
+  else  
+      console.log(err);  
+})  
+});
+
+
+//ELIMINAR REPORTE DE FALLAS
+
+app.delete('/fallas/:COD_REPORTE_FALLA',(req,res)=>{  
+  let emp=req.body;
+  var sql= "SET @COD_REPORTE_FALLA = ?;\
+  CALL PROCE_REPORTE_FALLAS_DELETE(@COD_REPORTE_FALLA);"
+  mysqlConnection.query(sql,[emp.COD_REPORTE_FALLA],(err,rows,fields)=>{
+  if(!err)
+  res.send("REPORTE DE FALLA DESACTIVADO");
+  else console.log(err);    
+  })
+  });
+
+
+
+  
+/*--------------------------------VENTAS---------------------------------*/
+
+// VER VENTAS
+app.get('/ventas', (req, res) => {
+  mysqlConnection.query('CALL PROCE_VENTAS_SELECT_TRANSACCIONAL',(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+//VER UNA venta
+
+app.get('/ventaUNA', (req, res) => {
+  const {  cod_venta } = req.body; 
+  const query = `CALL PROCE_VENTAS_SELECT_UNO_TRANSACCIONAL(?); `; 
+  mysqlConnection.query(query, [cod_venta],(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+//Insert venta
+
+app.post('/ventas/insert', (req, res) => {
+  const {COD_SERVICIO, COD_CLIENTE, COD_USUARIO, PRECIO, DESCRIPCION} = req.body;
+  console.log(req.body);
+  const query = `
+  CALL PROCE_VENTAS_INSERT_TRANSACCIONAL(?, ?, ?, ?, ?);
+  `;
+  mysqlConnection.query(query, [COD_SERVICIO, COD_CLIENTE, COD_USUARIO, PRECIO, DESCRIPCION], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'VENTA CREADA'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+//actualizar ventas
+app.post('/VENTA/:COD_VENTA',(req,res)=>{  
+  let COD_VENTA = req.body.COD_VENTA; 
+  let COD_SERVICIO = req.body.COD_SERVICIO;  
+  let COD_CLIENTE = req.body.COD_CLIENTE;  
+  let COD_USUARIO = req.body.COD_USUARIO;  
+  let COD_ESTADO = req.body.COD_ESTADO; 
+  let PRECIO = req.body.PRECIO;  
+  let DESCRIPCION = req.body.DESCRIPCION;  
+ mysqlConnection.query(`CALL PROCE_VENTAS_UPDATE_TRANSACCIONAL(?, ?, ?, ?, ?, ?, ?);`,[COD_VENTA,COD_SERVICIO,COD_CLIENTE,COD_USUARIO,COD_ESTADO,PRECIO,DESCRIPCION],(err,rows,fields)=>{  
+  if(!err)   
+  res.send("Datos actualizados correctamente"),
+  console.log(rows);
+  else  
+      console.log(err);  
+})  
+});
+
+
+//ELIMINAR Ventas
+
+app.delete('/venta/:COD_VENTA',(req,res)=>{  
+  let emp=req.body;
+  var sql= "SET @COD_VENTA = ?;\
+  CALL PROCE_VENTAS_DELETE_TRANSACCIONAL(@COD_VENTA);"
+  mysqlConnection.query(sql,[emp.COD_VENTA],(err,rows,fields)=>{
+  if(!err)
+  res.send("VENTA FINALIZADA");
+  else console.log(err);    
+  })
+  });
+
+
+//******* EMPLEADOS************************************ */
+
+
+
+// VER EMPLEADOS 
+app.get('/empleados', (req, res) => {
+  mysqlConnection.query('CALL PROCE_EMPLEADOS_SELECT',(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+//VER UN EMPLEADO
+
+app.get('/empleadoUNO', (req, res) => {
+  const { COD_EMPLEADO } = req.body; 
+  const query = `CALL PROCE_EMPLEADOS_SELECT_UNO(?); `; 
+  mysqlConnection.query(query, [COD_EMPLEADO],(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+// INSERTAR EMPLEADOS
+app.post('/empleados/insert', (req, res) => {
+  const {DNI_EMPLEADO, NOMBRE_EMPLEADO, APELLIDOS_EMPLEADO, SEXO_EMPLEADO, ESTADO_CIVIL_EMPLEADO, EDAD_EMPLEADO, TELEFONO_EMPLEADO,CORREO_EMPLEADO} = req.body;
+  console.log(req.body);
+  const query = `
+  CALL PROCE_EMPLEADOS_INSERT(?, ?, ?, ?, ?, ?, ?, ?)`;
+  mysqlConnection.query(query, [DNI_EMPLEADO, NOMBRE_EMPLEADO, APELLIDOS_EMPLEADO, SEXO_EMPLEADO, ESTADO_CIVIL_EMPLEADO, EDAD_EMPLEADO, TELEFONO_EMPLEADO,CORREO_EMPLEADO], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'EMPLEADO INGRESADO'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+// ACTUALIZAR EMPLEADOS
+app.post('/EMPLEADO/:COD_EMPLEADO',(req,res)=>{  
+  let COD_EMPLEADO = req.body.COD_EMPLEADO; 
+  let DNI_EMPLEADO = req.body.DNI_EMPLEADO;  
+  let NOMBRE_EMPLEADO = req.body.NOMBRE_EMPLEADO;  
+  let APELLIDOS_EMPLEADO = req.body.APELLIDOS_EMPLEADO;  
+  let SEXO_EMPLEADO = req.body.SEXO_EMPLEADO; 
+  let ESTADO_CIVIL_EMPLEADO = req.body.ESTADO_CIVIL_EMPLEADO;  
+  let EDAD_EMPLEADO = req.body.EDAD_EMPLEADO;  
+  let TELEFONO_EMPLEADO = req.body.TELEFONO_EMPLEADO;  
+  let CORREO_EMPLEADO = req.body.CORREO_EMPLEADO;  
+ mysqlConnection.query(`CALL PROCE_EMPLEADOS_UPDATE(?, ?, ?, ?, ?, ?, ?, ?, ?);`,[COD_EMPLEADO,DNI_EMPLEADO,NOMBRE_EMPLEADO,APELLIDOS_EMPLEADO,SEXO_EMPLEADO,ESTADO_CIVIL_EMPLEADO,EDAD_EMPLEADO,TELEFONO_EMPLEADO,CORREO_EMPLEADO],(err,rows,fields)=>{  
+  if(!err)   
+  res.send("Datos actualizados correctamente"),
+  console.log(rows);
+  else  
+      console.log(err);  
+})  
+});
+
+
+
+// ELIMINAR empleados
+app.delete('/empleado/:COD_EMPLEADO',(req,res)=>{  
+  let emp=req.body;
+  var sql= "SET @COD_EMPLEADO = ?;\
+  CALL PROCE_EMPLEADOS_DELETE(@COD_EMPLEADO);"
+  mysqlConnection.query(sql,[emp.COD_EMPLEADO],(err,rows,fields)=>{
+  if(!err)
+  res.send("empleado eliminado");
+  else console.log(err);    
+  })
+  });
+
+
+
+//************************INVENTARIO**************************** */
+  // VER INVENTARIO
+  app.get('/inventario', (req, res) => {
+    mysqlConnection.query('CALL PROCE_INVENTARIO_SELECT',(err, rows, fields) => {
+      if (!err) {
+        res.json(rows[0]);
+      } else {
+        console.log(err);
+      }
+    });
+  });
+
+ 
+  //VER INVENTARIO UNO
+
+
+  app.get('/inventario/UNO', (req, res) => {
+    const { COD_INVENTARIO } = req.body; 
+    const query = `CALL PROCE_INVENTARIO_SELECT_UNO(?); `; 
+    mysqlConnection.query(query, [COD_INVENTARIO],(err, rows, fields) => {
+      if (!err) {
+        res.json(rows[0]);
+      } else {
+        console.log(err);
+      }
+    });
+  });
+
+
+
+// INSERTAR INVENTARIO
+   app.post('/inventario/insert', (req, res) => {
+    const {COD_ARTICULO, CANTIDAD_ARTICULO, TIPO_INVENTARIO} = req.body;
+    console.log(req.body);
+    const query = `
+    CALL PROCE_INVENTARIOS_INSERT(?, ?, ?);
+    `;
+    mysqlConnection.query(query, [COD_ARTICULO, CANTIDAD_ARTICULO, TIPO_INVENTARIO], (err, rows, fields) => {
+      if(!err) {
+        res.json({status: 'Articulo Ingresado'});
+      } else {
+        console.log(err);
+      }
+    });
+  });
+
+ 
+  
+
+      //actualizar iNVENTARIO
+app.post('/INVENTARIO/:COD_INVENTARIO',(req,res)=>{  
+  let COD_INVENTARIO = req.body.COD_INVENTARIO; 
+  let COD_ARTICULO = req.body.COD_ARTICULO;  
+  let CANTIDAD_ARTICULO = req.body.CANTIDAD_ARTICULO;  
+  let TIPO_INVENTARIO = req.body.TIPO_INVENTARIO; 
+ mysqlConnection.query(`CALL PROCE_INVENTARIO_UPDATE(?, ?, ?, ?);`,[COD_INVENTARIO,COD_ARTICULO, CANTIDAD_ARTICULO, TIPO_INVENTARIO],(err,rows,fields)=>{  
+  if(!err)   
+  res.send("Datos actualizados correctamente"),
+  console.log(rows);
+  else  
+      console.log(err);  
+})  
+});
+
+
+
+
+
+// ELIMINAR INVENTARIO
+app.delete('/inventario/:COD_INVENTARIO',(req,res)=>{  
+  let emp=req.body;
+  var sql= "SET @COD_INVENTARIO = ?;\
+  CALL PROCE_INVENTARIO_DELETE(@COD_INVENTARIO);"
+  mysqlConnection.query(sql,[emp.COD_INVENTA],(err,rows,fields)=>{
+  if(!err)
+  res.send("inventario eliminado");
+  else console.log(err);    
+  })
+  });
+
+
+
+     //*******************PROVEEDORES************************* */
+     //Ver Proveedores
+     app.get('/proveedores', (req, res) => {
+      mysqlConnection.query('CALL PROCE_PROVEEDORES_SELECT',(err, rows, fields) => {
+        if (!err) {
+          res.json(rows[0]);
+        } else {
+          console.log(err);
+        }
+      });
+    });
+
+
+    
+  //VER UN PROVEEDOR
+
+
+  app.get('/proveedor/UNO', (req, res) => {
+    const { COD_PROVEEDOR } = req.body; 
+    const query = `CALL PROCE_PROVEEDORES_SELECT_UNO(?); `; 
+    mysqlConnection.query(query, [COD_PROVEEDOR],(err, rows, fields) => {
+      if (!err) {
+        res.json(rows[0]);
+      } else {
+        console.log(err);
+      }
+    });
+  });
+     
+     
+     
+         // INSERTAR PROVEEDOR
+    app.post('/proveedores/INSERT', (req, res) => {
+      const {nombre_proveedor, banco_proveedor, cuenta_proveedor,telefono_proveedor,EXTENSION_PROVEEDOR,celular_proveedor,contacto_proveedor,cargo_contacto,direccion_proveedor,pais_proveedor,CIUDAD_PROVEEDOR,correo_proveedor,fecha_registro_prov,estado_proveedor } = req.body;
+      console.log(req.body);
+      const query = `
+      CALL PROCE_PROVEEDORES_INSERT(?, ?, ?, ?,?, ?, ?, ?,?, ?, ?, ?);
+        `;
+      mysqlConnection.query(query, [nombre_proveedor, banco_proveedor, cuenta_proveedor,telefono_proveedor,EXTENSION_PROVEEDOR,celular_proveedor,contacto_proveedor,cargo_contacto,direccion_proveedor,pais_proveedor,CIUDAD_PROVEEDOR,correo_proveedor,fecha_registro_prov,estado_proveedor], (err, rows, fields) => {
+        if(!err) {
+          res.json({status: 'PROVEEDOR INGRESADO'});
+        } else {
+          console.log(err);
+        }
+      });
+    });
+
+
+          //actualizar Proveedor
+app.post('/proveedor/:COD_PROVEEDOR',(req,res)=>{  
+  let COD_PROVEEDOR = req.body.COD_PROVEEDOR; 
+  let NOMBRE_PROVEEDOR = req.body.NOMBRE_PROVEEDOR;  
+  let BANCO_PROVEEDOR = req.body.BANCO_PROVEEDOR;  
+  let CUENTA_PROVEEDOR = req.body.CUENTA_PROVEEDOR; 
+  let TELEFONO_PROVEEDOR = req.body.TELEFONO_PROVEEDOR;
+  let EXTENSION_PROVEEDOR = req.body.EXTENSION_PROVEEDOR;
+  let CELULAR_PROVEEDOR = req.body.CELULAR_PROVEEDOR;
+  let CONTACTO_PROVEEDOR = req.body.CONTACTO_PROVEEDOR;
+  let CARGO_CONTACTO = req.body.CARGO_CONTACTO;
+  let DIRECCION_PROVEEDOR = req.body.DIRECCION_PROVEEDOR;
+  let PAIS_PROVEEDOR = req.body.PAIS_PROVEEDOR;
+  let CIUDAD_PROVEEDOR = req.body.CIUDAD_PROVEEDOR;
+  let CORREO_PROVEEDOR = req.body.CORREO_PROVEEDOR;
+ mysqlConnection.query(`CALL PROCE_PROVEEDORES_UPDATE(?, ?, ?, ?,?, ?, ?, ?,?, ?, ?, ?, ?);`,[COD_PROVEEDOR,NOMBRE_PROVEEDOR, BANCO_PROVEEDOR,CUENTA_PROVEEDOR, TELEFONO_PROVEEDOR,EXTENSION_PROVEEDOR,CELULAR_PROVEEDOR,CONTACTO_PROVEEDOR,CARGO_CONTACTO,DIRECCION_PROVEEDOR,PAIS_PROVEEDOR,CIUDAD_PROVEEDOR,CORREO_PROVEEDOR],(err,rows,fields)=>{  
+  if(!err)   
+  res.send("Datos actualizados correctamente"),
+  console.log(rows);
+  else  
+      console.log(err);  
+})  
+});
+    
+
+
+    
+   // ELIMINAR PROVEEDOR
+app.delete('/proveedor/:COD_PROVEEDOR',(req,res)=>{  
+  let emp=req.body;
+  var sql= "SET @COD_PROVEEDOR = ?;\
+  CALL PROCE_PROVEEDORES_DELETE(@COD_PROVEEDOR);"
+  mysqlConnection.query(sql,[emp.COD_PROVEEDOR],(err,rows,fields)=>{
+  if(!err)
+  res.send("proveedor eliminado");
+  else console.log(err);    
+  })
+  });
+
+
+
+    
+/***********************PREGUNTAS*************************** */
+
+//ELIMINAR PREGUNTAS
+app.delete('/preguntas/:cod_pregunta',(req,res)=>{  
+  let emp=req.body;
+  var sql= "SET @cod_pregunta = ?;\
+  CALL PROCE_PREGUNTAS_DELETE(@cod_pregunta );"
+  mysqlConnection.query(sql,[emp.cod_pregunta ],(err,rows,fields)=>{
+  if(!err)
+  res.send("PREGUNTA DESACTIVADA");
+  else console.log(err);    
+  })
+  });
+
+
+      
+   // ELIMINAR PROVEEDOR
+app.delete('/preguntas/:COD_PREGUNTA',(req,res)=>{  
+  let emp=req.body;
+  var sql= "SET @COD_PREGUNTA = ?;\
+  CALL PROCE_PREGUNTAS_DELETE(@COD_PREGUNTA);"
+  mysqlConnection.query(sql,[emp.COD_PREGUNTA],(err,rows,fields)=>{
+  if(!err)
+  res.send("PREGUNTA DESACTIVADA");
+  else console.log(err);    
+  })
+  });
+
+
+
+
+// VER PREGUNTA
+  
+  app.get('/preguntas', (req, res) => {
+    mysqlConnection.query('CALL PROCE_PREGUNTAS_SELECT',(err, rows, fields) => {
+      if (!err) {
+        res.json(rows[0]);
+      } else {
+        console.log(err);
+      }
+    });
+  });
+
+
+   //VER UNA PREGUNTA
+
+   app.get('/preguntaUNO', (req, res) => {
+    const { COD_PREGUNTA } = req.body; 
+    const query = `CALL PROCE_PREGUNTAS_SELECT_UNO(?); `; 
+    mysqlConnection.query(query, [COD_PREGUNTA],(err, rows, fields) => {
+      if (!err) {
+        res.json(rows[0]);
+      } else {
+        console.log(err);
+      }
+    });
+  });
+
+  
+      //actualizar PREGUNTAS
+app.post('/pregunta/:COD_PREGUNTA',(req,res)=>{  
+  let COD_PREGUNTA = req.body.COD_PREGUNTA; 
+  let PREGUNTA = req.body.PREGUNTA;  
+  let ESTADO_PREGUNTA = req.body.ESTADO_PREGUNTA;  
+ mysqlConnection.query(`CALL PROCE_PREGUNTAS_UPDATE(?, ?, ?);`,[COD_PREGUNTA, PREGUNTA, ESTADO_PREGUNTA],(err,rows,fields)=>{  
+  if(!err)   
+  res.send("Datos actualizados correctamente"),
+  console.log(rows);
+  else  
+      console.log(err);  
+})  
+});
+
+
+
+ // INSERTAR PREGUNTAS
+ app.post('/preguntas', (req, res) => {
+  const { pregunta} = req.body;
+  console.log(req.body);
+  const query = `
+  CALL PROCE_PREGUNTAS_INSERT(?);
+    `;
+  mysqlConnection.query(query, [ pregunta], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'PREGUNTA INGRESADA'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+
+/*--------------------------------INVENTARIO HERRAMIENTA---------------------------------*/
+
+// VER HERRAMIENTAS
+app.get('/herramientas', (req, res) => {
+  mysqlConnection.query('CALL PROCE_INVENTARIO_HERRAMIENTAS_SELECT',(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+//UN HERRAMIENTAS
+app.get('/herramienta', (req, res) => {
+  const {  COD_HERRAMIENTA } = req.body; 
+  const query = `CALL PROCE_INVENTARIO_HERRAMIENTAS_UNO(?); `; 
+  mysqlConnection.query(query ,[COD_HERRAMIENTA],(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+// INSERTAR HERRAMIENTAS
+app.post('/herramienta/insert', (req, res) => {
+  const {  COD_HERRAMIENTA } = req.params;
+  const {NOMBRE_HERRAMIENTA,DESCRIPCION_HERRAMIENTA,NUM_EXISTENCIA,COD_EMPLEADO} = req.body;
+  console.log(req.body);
+  const query = `CALL PROCE_INVENTARIO_HERRAMIENTAS_INSERT(?,?,?,?); `;
+
+  mysqlConnection.query(query, [NOMBRE_HERRAMIENTA,DESCRIPCION_HERRAMIENTA,NUM_EXISTENCIA,COD_EMPLEADO], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'HERRAMIENTA CREADA'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+// ACTUALIZAR HERRAMIENTAS
+app.put('/herramienta/actualizar', (req, res) => {
+  // const { CATEGORIA } = req.params;
+  const {COD_HERRAMIENTA,NOMBRE_HERRAMIENTA,DESCRIPCION_HERRAMIENTA,NUM_EXISTENCIA,COD_EMPLEADO } = req.body; 
+  const query = `CALL PROCE_INVENTARIO_HERRAMIENTAS_UPDATE(?,?,?,?,?); `;  
+  mysqlConnection.query(query, [COD_HERRAMIENTA,NOMBRE_HERRAMIENTA,DESCRIPCION_HERRAMIENTA,NUM_EXISTENCIA,COD_EMPLEADO], (err, rows, fields) => {
+    if(!err) {      
+      res.json({status: 'HERRAMIENTA ACTUALIZADO'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+
+// ELIMINAR HERRAMIENTAS
+app.delete('/herramienta/eliminar', (req, res) => {
+  // const { COD_ARTICULO } = req.params;
+  const { COD_HERRAMIENTA } = req.body;
+  const query = ` CALL PROCE_INVENTARIO_HERRAMIENTAS_DELETE(?); `;
+  mysqlConnection.query(query, [COD_HERRAMIENTA], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'HERRAMIENTA ELIMINADO'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+
+
+
+
+  /*--------------------------------Articulos---------------------------------*/
+
+// VER articulos 
+app.get('/articulos', (req, res) => {
+  mysqlConnection.query('CALL PROCE_ARTICULOS_SELECT',(err, rows, fields) => {
+    
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+//UNA ARTICULO
+app.get('/articulo', (req, res) => {
+  const {P_COD_ARTICULO} = req.body; 
+  const query = `CALL PROCE_ARTICULOS_SELECT_UNO(?); `; 
+  mysqlConnection.query(query, [P_COD_ARTICULO],(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+
+
+
+
+
+// INSERTAR articulos 
+app.post('/articulo/insert', (req, res) => {
+  const { COD_ARTICULO } = req.params;
+  const {NOMBRE_ARTICULO, DESCRIPCION_ARTICULO, PRECIO_ARTICULO, COD_CATEGORIA} = req.body;
+  console.log(req.body);
+  const query = `
+  CALL PROCE_ARTICULOS_INSERT(?, ?, ?, ?);
+  `;
+  mysqlConnection.query(query, [NOMBRE_ARTICULO, DESCRIPCION_ARTICULO, PRECIO_ARTICULO, COD_CATEGORIA], (err, rows, fields) => {
+    
+    if(!err) {
+      res.json({status: 'Articulo Creado'});
+     
+    } else {
+      console.log(err);
+    }
+  });
+});
+// ACTUALIZAR articulos 
+app.put('/articulo/actualizar', (req, res) => {
+  // const { COD_ARTICULO } = req.params;
+  const { COD_ARTICULO, NOMBRE_ARTICULO, DESCRIPCION_ARTICULO, PRECIO_ARTICULO, COD_CATEGORIA } = req.body; 
+  const query = `CALL PROCE_ARTICULOS_UPDATE(?,?,?,?,?); `;
+  
+  mysqlConnection.query(query, [ COD_ARTICULO, NOMBRE_ARTICULO, DESCRIPCION_ARTICULO, PRECIO_ARTICULO, COD_CATEGORIA], (err, rows, fields) => {
+    if(!err) {      
+      res.json({status: 'ARTICULO ACTUALIZADO'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+// ELIMINAR articulo
+app.delete('/articulo/eliminar', (req, res) => {
+  // const { COD_ARTICULO } = req.params;
+  const { COD_ARTICULO } = req.body;
+  const query = ` call PROCE_ARTICULOS_DELETE(?); `;
+  mysqlConnection.query(query, [COD_ARTICULO], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'ARTICULO ELIMINADO'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+
+/*--------------------------------Categoria---------------------------------*/
+
+// VER CATEGORIA
+app.get('/categorias', (req, res) => {
+  mysqlConnection.query('CALL PROCE_CATEGORIAS_SELECT',(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+//UNA CATEGORIA
+app.get('/categoria', (req, res) => {
+  const {  COD_CATEGORIA } = req.body; 
+  const query = `CALL PROCE_CATEGORIA_SELECT_UNO(?); `; 
+  mysqlConnection.query(query, [COD_CATEGORIA],(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+// INSERTAR CATEGORIA
+app.post('/categoria/insert', (req, res) => {
+  const {NOMBRE_CATEGORIA} = req.body;
+  console.log(req.body);
+  const query = `  CALL PROCE_CATEGORIAS_INSERT(?);`;
+  mysqlConnection.query(query, [NOMBRE_CATEGORIA], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'Categoria Creada'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+// ACTUALIZAR CATEGORIA
+app.put('/categoria/actualizar', (req, res) => {
+  // const { CATEGORIA } = req.params;
+  const { COD_CATEGORIA, NOMBRE_CATEGORIA } = req.body; 
+  const query = `CALL PROCE_CATEGORIAS_UPDATE(?,?); `;  
+  mysqlConnection.query(query, [ COD_CATEGORIA, NOMBRE_CATEGORIA,], (err, rows, fields) => {
+    if(!err) {      
+      res.json({status: 'CATEGORIA ACTUALIZADA'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+// ELIMINAR CATEGORIA
+app.delete('/categoria/eliminar', (req, res) => {
+  // const { COD_ARTICULO } = req.params;
+  const { COD_CATEGORIA } = req.body;
+  const query = ` call PROCE_CATEGORIA_DELETE(?); `;
+  mysqlConnection.query(query, [COD_CATEGORIA], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'CATEGORIA ELIMINADA'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+
+/*--------------------------------CLIENTES---------------------------------*/
+
+// VER CATEGORIA
+app.get('/clientes', (req, res) => {
+  mysqlConnection.query('CALL PROCE_CLIENTES_SELECT',(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+//UN CLIENTE
+app.get('/cliente', (req, res) => {
+  const {  P_DNI_CLIENTE } = req.body; 
+  const query = `CALL PROCE_CLIENTES_SELECT_UNO(?); `; 
+  mysqlConnection.query(query ,[P_DNI_CLIENTE],(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+// INSERTAR CLIENTE
+app.post('/clientes/insert', (req, res) => {
+  const { COD_CLIENTE } = req.params;
+  const {DNI_CLIENTE, NOMBRE_CLIENTE, APELLIDOS_CLIENTE, DIRECCION_CLIENTE, CIUDAD_CLIENTE,TELEFONO_CLIENTE,CORREO_CLIENTE, RTN_CLIENTE, COD_TIPO_CLIENTE} = req.body;
+  console.log(req.body);
+  const query = `CALL PROCE_CLIENTES_INSERT(?,?,?,?,?,?,?,?,?); `;
+
+  mysqlConnection.query(query, [DNI_CLIENTE, NOMBRE_CLIENTE, APELLIDOS_CLIENTE, DIRECCION_CLIENTE, CIUDAD_CLIENTE,TELEFONO_CLIENTE,CORREO_CLIENTE, RTN_CLIENTE, COD_TIPO_CLIENTE], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'CLIENTE CREADO'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+// ACTUALIZAR CLIENTE
+app.put('/cliente/actualizar', (req, res) => {
+  // const { CATEGORIA } = req.params;
+  const { COD_CLIENTE, DNI_CLIENTE, NOMBRE_CLIENTE, APELLIDOS_CLIENTE, DIRECCION_CLIENTE, CIUDAD_CLIENTE,TELEFONO_CLIENTE,CORREO_CLIENTE, RTN_CLIENTE, COD_TIPO_CLIENTE } = req.body; 
+  const query = `CALL PROCE_CLIENTES_UPDATE(?,?,?,?,?,?,?,?,?,?); `;  
+  mysqlConnection.query(query, [COD_CLIENTE, DNI_CLIENTE, NOMBRE_CLIENTE, APELLIDOS_CLIENTE, DIRECCION_CLIENTE, CIUDAD_CLIENTE,TELEFONO_CLIENTE,CORREO_CLIENTE, RTN_CLIENTE, COD_TIPO_CLIENTE], (err, rows, fields) => {
+    if(!err) {      
+      res.json({status: 'CLIENTE ACTUALIZADO'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+// ELIMINAR CLIENTE
+app.delete('/cliente/eliminar', (req, res) => {
+  // const { COD_ARTICULO } = req.params;
+  const { COD_CLIENTE } = req.body;
+  const query = ` CALL PROCE_CLIENTES_DELETE(?); `;
+  mysqlConnection.query(query, [COD_CLIENTE], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'CLIENTE ELIMINADO'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*--------------------------------PERMISOS---------------------------------*/
+
+// VER PERMISOS
+app.get('/permisos', (req, res) => {
+  mysqlConnection.query('CALL PROCE_PERMISOS_SELECT',(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+//UN PERMISOS
+app.get('/permiso', (req, res) => {
+  const {  P_COD_PERMISO } = req.body; 
+  const query = `CALL PROCE_PERMISOS_SELECT_UNO(?); `; 
+  mysqlConnection.query(query ,[P_COD_PERMISO],(err, rows, fields) => {
+    if (!err) {
+      res.json(rows[0]);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+// INSERTAR PERMISOS
+app.post('/permiso/insert', (req, res) => {
+  const { P_COD_PERMISO } = req.params;
+  const {NOMBRE_PERMISO,DESCRIPCION_PERMISO,COD_ROL} = req.body;
+  console.log(req.body);
+  const query = `CALL PROCE_PERMISOS_INSERT(?,?,?); `;
+
+  mysqlConnection.query(query, [NOMBRE_PERMISO,DESCRIPCION_PERMISO,COD_ROL], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'PERMISO CREADO'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+// ACTUALIZAR PERMISOS
+app.put('/permiso/actualizar', (req, res) => {
+  // const { CATEGORIA } = req.params;
+  const { COD_PERMISO,NOMBRE_PERMISO,DESCRIPCION_PERMISO,COD_ROL } = req.body; 
+  const query = `CALL PROCE_PERMISOS_UPDATE(?,?,?,?); `;  
+  mysqlConnection.query(query, [COD_PERMISO,NOMBRE_PERMISO,DESCRIPCION_PERMISO,COD_ROL], (err, rows, fields) => {
+    if(!err) {      
+      res.json({status: 'PERMISO ACTUALIZADO'});
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+
+// ELIMINAR PERMISOS
+app.delete('/permiso/eliminar', (req, res) => {
+  // const { COD_ARTICULO } = req.params;
+  const { P_COD_PERMISO } = req.body;
+  const query = ` CALL PROCE_PERMISOS_DELETE(?); `;
+  mysqlConnection.query(query, [P_COD_PERMISO], (err, rows, fields) => {
+    if(!err) {
+      res.json({status: 'PERMISO ELIMINADO'});
+    } else {
+      console.log(err);
+    }
+  });
+});
