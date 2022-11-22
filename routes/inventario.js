@@ -68,8 +68,8 @@ routes.post('/insert_inventario',ensureToken, function (req, res){
         if(err) {
             res.send('ACCESO DENEGADO')
         }else{
-            const {COD_ARTICULO, CANTIDAD_ARTICULO, TIPO_INVENTARIO} = req.body;
-            const consulta = `CALL PROCE_INVENTARIOS_INSERT('${COD_ARTICULO}','${CANTIDAD_ARTICULO}','${TIPO_INVENTARIO}')`;
+            const {COD_ARTICULO, CANTIDAD_ARTICULO} = req.body;
+            const consulta = `CALL PROCE_INVENTARIOS_INSERT('${COD_ARTICULO}','${CANTIDAD_ARTICULO}')`;
    
             req.getConnection((err, conn)=>{
             conn.query(consulta, (err, rows)=>{
@@ -90,8 +90,8 @@ routes.put('/update_inventario',ensureToken, function  (req,res){
         if(err) {
             res.send('ACCESO DENEGADO')
         }else{
-            const {COD_INVENTARIO,COD_ARTICULO,CANTIDAD_ARTICULO,TIPO_INVENTARIO} = req.body;
-            const consulta = `CALL PROCE_INVENTARIO_UPDATE('${COD_INVENTARIO}','${COD_ARTICULO}','${CANTIDAD_ARTICULO}','${TIPO_INVENTARIO}')`;
+            const {COD_INVENTARIO,COD_ARTICULO,CANTIDAD_ARTICULO} = req.body;
+            const consulta = `CALL PROCE_INVENTARIO_UPDATE('${COD_INVENTARIO}','${COD_ARTICULO}','${CANTIDAD_ARTICULO}')`;
    
             req.getConnection((err,conn)=>{
             conn.query(consulta,(err,rows)=>{
