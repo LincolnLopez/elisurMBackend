@@ -62,7 +62,7 @@ routes.get('/inventario',ensureToken, function (req, res){
 
 
 // INSERTAR INVENTARIO
-routes.post('/inventario/insert',ensureToken, function (req, res){
+routes.post('/insert_inventario',ensureToken, function (req, res){
 
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
@@ -85,7 +85,7 @@ routes.post('/inventario/insert',ensureToken, function (req, res){
 })
 
 // ACTUALIZAR CATEGORIA
-routes.put('/inventario/actualizar',ensureToken, function  (req,res){
+routes.put('/update_inventario',ensureToken, function  (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO DENEGADO')
@@ -106,7 +106,7 @@ routes.put('/inventario/actualizar',ensureToken, function  (req,res){
 })
 
 // ELIMINAR CATEGORIA
-routes.delete('/Inventario/eliminar',ensureToken, function (req,res){
+routes.delete('/delete_inventario',ensureToken, function (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO DENEGADO')
