@@ -42,8 +42,8 @@ routes.get('/cliente',ensureToken, function (req, res){
        if(err) {
            res.send('ACCESO DENEGADO')
        }else{
-           const {P_DNI_CLIENTE } = req.body;
-           const consulta = `CALL PROCE_CLIENTES_SELECT_UNO('${P_DNI_CLIENTE }')`;
+           const {P_COD_CLIENTE } = req.body;
+           const consulta = `CALL PROCE_CLIENTES_SELECT_UNO('${P_COD_CLIENTE }')`;
   
            req.getConnection((err, conn)=>{
            conn.query(consulta, (err, rows)=>{
@@ -60,14 +60,14 @@ routes.get('/cliente',ensureToken, function (req, res){
 
 
 // INSERTAR CLIENTE
-routes.post('/clientes/insert',ensureToken, function (req, res){
+routes.post('/insert_cliente',ensureToken, function (req, res){
 
    jwt.verify(req.token, 'my_secret_key', (err,data)=>{
        if(err) {
            res.send('ACCESO DENEGADO')
        }else{
-           const {DNI_CLIENTE, NOMBRE_CLIENTE, APELLIDOS_CLIENTE, DIRECCION_CLIENTE, CIUDAD_CLIENTE,TELEFONO_CLIENTE,CORREO_CLIENTE, RTN_CLIENTE, COD_TIPO_CLIENTE} = req.body;
-           const consulta = `CALL PROCE_CLIENTES_INSERT('${DNI_CLIENTE}','${NOMBRE_CLIENTE}','${APELLIDOS_CLIENTE}','${DIRECCION_CLIENTE}','${CIUDAD_CLIENTE}','${TELEFONO_CLIENTE}','${CORREO_CLIENTE}','${RTN_CLIENTE}','${COD_TIPO_CLIENTE}')`;
+           const {DNI_CLIENTE, NOMBRE_CLIENTE, APELLIDOS_CLIENTE, DIRECCION_CLIENTE, RTN_CLIENTE,TELEFONO_CLIENTE,CORREO_CLIENTE, COD_TIPO_CLIENTE} = req.body;
+           const consulta = `CALL PROCE_CLIENTES_INSERT('${DNI_CLIENTE}','${NOMBRE_CLIENTE}','${APELLIDOS_CLIENTE}','${DIRECCION_CLIENTE}','${RTN_CLIENTE}','${TELEFONO_CLIENTE}','${CORREO_CLIENTE}','${COD_TIPO_CLIENTE}')`;
   
            req.getConnection((err, conn)=>{
            conn.query(consulta, (err, rows)=>{
@@ -83,13 +83,13 @@ routes.post('/clientes/insert',ensureToken, function (req, res){
 })
 
 // ACTUALIZAR CATEGORIA
-routes.put('/cliente/actualizar',ensureToken, function  (req,res){
+routes.put('/update_cliente',ensureToken, function  (req,res){
    jwt.verify(req.token, 'my_secret_key', (err,data)=>{
        if(err) {
            res.send('ACCESO DENEGADO')
        }else{
-         const {COD_CLIENTE,DNI_CLIENTE, NOMBRE_CLIENTE, APELLIDOS_CLIENTE, DIRECCION_CLIENTE, CIUDAD_CLIENTE,TELEFONO_CLIENTE,CORREO_CLIENTE, RTN_CLIENTE, COD_TIPO_CLIENTE} = req.body;
-           const consulta = `CALL PROCE_CLIENTES_UPDATE('${COD_CLIENTE}','${DNI_CLIENTE}','${NOMBRE_CLIENTE}','${APELLIDOS_CLIENTE}','${DIRECCION_CLIENTE}','${CIUDAD_CLIENTE}','${TELEFONO_CLIENTE}','${CORREO_CLIENTE}','${RTN_CLIENTE}','${COD_TIPO_CLIENTE}')`;
+         const {COD_CLIENTE,DNI_CLIENTE, NOMBRE_CLIENTE, APELLIDOS_CLIENTE, DIRECCION_CLIENTE,RTN_CLIENTE,TELEFONO_CLIENTE,CORREO_CLIENTE , COD_TIPO_CLIENTE} = req.body;
+           const consulta = `CALL PROCE_CLIENTES_UPDATE('${COD_CLIENTE}','${DNI_CLIENTE}','${NOMBRE_CLIENTE}','${APELLIDOS_CLIENTE}','${DIRECCION_CLIENTE}','${RTN_CLIENTE}','${TELEFONO_CLIENTE}','${CORREO_CLIENTE}','${COD_TIPO_CLIENTE}')`;
   
            req.getConnection((err,conn)=>{
            conn.query(consulta,(err,rows)=>{
