@@ -105,23 +105,25 @@ routes.put('/update_inventario',ensureToken, function  (req,res){
     })
 })
 
-// ELIMINAR CATEGORIA
-routes.delete('/delete_inventario',ensureToken, function (req,res){
+// ELIMINAR INVENTARIO
+
+
+routes.delete('/eliminar_inventario',ensureToken, function  (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
-            res.send('ACCESO DENEGADO')
+            res.send('ACCESO NO PERMITIDO')
         }else{
-            const {COD_INVENTARIO } = req.params
-            const consulta = `CALL PROCE_INVENTARIO_DELETE('${COD_INVENTARIO }')`;
-
-             req.getConnection((err,conn)=>{
-             conn.query(consulta,[COD_INVENTARIO ],(err,rows)=>{
+            const {COD_INVENTARIO}= req.body
+            const consulta = `CALL PROCE_INVENTARIO_DELETE('${COD_INVENTARIO}')`;
+    
+            req.getConnection((err,conn)=>{
+            conn.query(consulta,(err,rows)=>{
                 if(!err)
-                res.send('INVENTARIO ELIMINADO')
+                res.send('ROL Eliminado')
                 else
-                console.log(err)
-                })
-            })
+                    console.log(err)
+                 })
+            })    
         }
     })
 })
