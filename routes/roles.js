@@ -40,6 +40,26 @@ routes.get('/roles', ensureToken, function (req,res){
     })
 })
 
+//Roles y permisos con Join
+routes.get('/roles_permisos', ensureToken, function (req,res){
+     
+    jwt.verify(req.token, 'my_secret_key', (err,data)=>{
+        if(err) {
+            res.send('ACCESO NO PERMITIDO')
+        }else{
+
+            req.getConnection((err,conn) =>{
+                if(err)return res.send(err)
+                conn.query('CALL PROCE_ROLES_PERMISOS_SELECT', (err,rows)=>{
+                    if(err) return res.send(err)
+                    
+                    res.status(200).json(rows[0]);
+                })
+        
+            })
+        }
+    })
+})
 
 //UN ROL
 routes.get('/rol',ensureToken, function (req, res){
@@ -66,7 +86,7 @@ routes.get('/rol',ensureToken, function (req, res){
 
 
 // INSERTAR ROL
-routes.post('/roles',ensureToken, function (req, res){
+routes.post('/insert_roles',ensureToken, function (req, res){
 
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
@@ -89,13 +109,13 @@ routes.post('/roles',ensureToken, function (req, res){
 })
 
 // ACTUALIZAR ROL
-routes.put('/roles/:COD_ROL',ensureToken, function  (req,res){
+routes.put('/actualizar_roles',ensureToken, function  (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO NO PERMITIDO')
         }else{
-            const {COD_ROL, NOMBRE_ROL, ESTADO_ROL}= req.body
-            const consulta = `CALL PROCE_ROL_UPDATE('${COD_ROL}','${NOMBRE_ROL}','${ESTADO_ROL}')`;
+            const {COD_ROL, NOMBRE_ROL}= req.body
+            const consulta = `CALL PROCE_ROL_UPDATE('${COD_ROL}','${NOMBRE_ROL}')`;
     
             req.getConnection((err,conn)=>{
             conn.query(consulta,(err,rows)=>{
@@ -114,7 +134,7 @@ routes.put('/roles/:COD_ROL',ensureToken, function  (req,res){
 
 //Eliminar rol
 
-routes.delete('/roles',ensureToken, function  (req,res){
+routes.delete('/eliminar_roles',ensureToken, function  (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO NO PERMITIDO')

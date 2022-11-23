@@ -59,14 +59,14 @@ routes.get('/permiso',ensureToken, function (req, res){
 
 
 // INSERTAR PERMISO
-routes.post('/apermiso/insert',ensureToken, function (req, res){
+routes.post('/insert_permisos',ensureToken, function (req, res){
 
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO DENEGADO')
         }else{
-            const {NOMBRE_PERMISO,DESCRIPCION_PERMISO,COD_ROL} = req.body;
-            const consulta = `CALL PROCE_PERMISOS_INSERT('${NOMBRE_PERMISO}','${DESCRIPCION_PERMISO}','${COD_ROL}')`;
+            const {COD_ROL,EDITAR_USUARIOS,VER_INVENTARIO,ASIGNAR_TRABAJO,CERRAR_ACTIVIDAD_ASIGNADA,SOLICITAR_PRESUPUESTO,GENERAR_REPORTES,REPORTES_FALLAS} = req.body;
+            const consulta = `CALL PROCE_PERMISO_INSERT('${COD_ROL}','${EDITAR_USUARIOS}','${VER_INVENTARIO}','${ASIGNAR_TRABAJO}','${CERRAR_ACTIVIDAD_ASIGNADA}','${SOLICITAR_PRESUPUESTO}','${GENERAR_REPORTES}','${REPORTES_FALLAS}')`;
    
             req.getConnection((err, conn)=>{
             conn.query(consulta, (err, rows)=>{
@@ -82,13 +82,13 @@ routes.post('/apermiso/insert',ensureToken, function (req, res){
 })
 
 // ACTUALIZAR PERMISO
-routes.put('/permiso/actualizar/',ensureToken, function  (req,res){
+routes.put('/actualizar_permisos',ensureToken, function  (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO DENEGADO')
         }else{
-            const {COD_PERMISO,NOMBRE_PERMISO,DESCRIPCION_PERMISO,COD_ROL} = req.body;
-            const consulta = `CALL PROCE_PERMISOS_UPDATE('${COD_PERMISO}','${NOMBRE_PERMISO}','${DESCRIPCION_PERMISO}','${COD_ROL}')`;
+            const {COD_ROL,EDITAR_USUARIOS,VER_INVENTARIO,ASIGNAR_TRABAJO,CERRAR_ACTIVIDAD_ASIGNADA,SOLICITAR_PRESUPUESTO,GENERAR_REPORTES,REPORTES_FALLAS} = req.body;
+            const consulta = `CALL PROCE_PERMISOS_UPDATE('${COD_ROL}','${EDITAR_USUARIOS}','${VER_INVENTARIO}','${ASIGNAR_TRABAJO}','${CERRAR_ACTIVIDAD_ASIGNADA}','${SOLICITAR_PRESUPUESTO}','${GENERAR_REPORTES}','${REPORTES_FALLAS}')`;
    
             req.getConnection((err,conn)=>{
             conn.query(consulta,(err,rows)=>{
@@ -101,18 +101,18 @@ routes.put('/permiso/actualizar/',ensureToken, function  (req,res){
         }
     })
 })
-
+ //esta no se usara, solo update
 // ELIMINAR PERMISOS
-routes.delete('/permiso/eliminar',ensureToken, function (req,res){
+routes.delete('/eliminar_permisos',ensureToken, function (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO DENEGADO')
         }else{
-            const {P_COD_PERMISO} = req.params
-            const consulta = `CALL PROCE_PERMISOS_DELETE('${P_COD_PERMISO }')`;
+            const {COD_PERMISO} = req.params
+            const consulta = `CALL PROCE_PERMISOS_DELETE('${COD_PERMISO }')`;
 
              req.getConnection((err,conn)=>{
-             conn.query(consulta,[P_COD_PERMISO ],(err,rows)=>{
+             conn.query(consulta,[COD_PERMISO ],(err,rows)=>{
                 if(!err)
                 res.send('ERMISO ELIMINADO')
                 else
