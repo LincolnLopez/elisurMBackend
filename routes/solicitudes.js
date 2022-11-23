@@ -42,7 +42,7 @@ routes.get('/solicitudes', ensureToken, function (req,res){
 
 
 //UNA SOLICITUD
-routes.get('/SOLICITUD',ensureToken, function (req, res){
+routes.get('/solicitud',ensureToken, function (req, res){
 
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
@@ -66,14 +66,14 @@ routes.get('/SOLICITUD',ensureToken, function (req, res){
 
 
 // INSERTAR SOLICITUD
-routes.post('/solicitudes',ensureToken, function (req, res){
+routes.post('/solicitudes/insert',ensureToken, function (req, res){
 
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO DENEGADO')
         }else{
-            const {NOMBRE_SOLICITANTE, TELEFONO, CORREO_ELECTRONICO, TIPO_SOLICITANTE, TELEFONO_OPCIONAL, DIRECCION_SOLICITANTE, CIUDAD, COD_SERVICIO, DESCRIPCION_SOLICITUD} = req.body;
-            const consulta = `CALL PROCE_SOLICITUDES_INSERT('${NOMBRE_SOLICITANTE}','${TELEFONO}','${CORREO_ELECTRONICO}','${TIPO_SOLICITANTE}','${TELEFONO_OPCIONAL}','${DIRECCION_SOLICITANTE}','${CIUDAD}','${COD_SERVICIO}','${DESCRIPCION_SOLICITUD}')`;
+            const {NOMBRE,APELLIDO, TELEFONO, CORREO_ELECTRONICO, TIPO_SOLICITANTE, TELEFONO_OPCIONAL, DIRECCION_SOLICITANTE , NOMBRE_E_C,RTN_DNI, CIUDAD, COD_SERVICIO, DESCRIPCION_SOLICITUD} = req.body;
+            const consulta = `CALL PROCE_SOLICITUDES_INSERT('${NOMBRE}','${APELLIDO}','${TELEFONO}','${CORREO_ELECTRONICO}','${TIPO_SOLICITANTE}','${TELEFONO_OPCIONAL}','${DIRECCION_SOLICITANTE}','${NOMBRE_E_C}','${RTN_DNI}','${CIUDAD}','${COD_SERVICIO}','${DESCRIPCION_SOLICITUD}')`;
    
             req.getConnection((err, conn)=>{
             conn.query(consulta, (err, rows)=>{
@@ -89,13 +89,13 @@ routes.post('/solicitudes',ensureToken, function (req, res){
 })
 
 // ACTUALIZAR SOLICITUD
-routes.put('/solicitudes/:COD_SOLICITUD',ensureToken, function  (req,res){
+routes.put('/solicitudes/update',ensureToken, function  (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO DENEGADO')
         }else{
-            const {COD_SOLICITUD,NOMBRE_SOLICITANTE, TELEFONO, CORREO_ELECTRONICO, TIPO_SOLICITANTE, TELEFONO_OPCIONAL, DIRECCION_SOLICITANTE, CIUDAD, COD_SERVICIO, DESCRIPCION_SOLICITUD,COD_ESTADO}= req.body
-            const consulta = `CALL PROCE_SOLICITUDES_UPDATE('${COD_SOLICITUD}','${NOMBRE_SOLICITANTE}','${TELEFONO}','${CORREO_ELECTRONICO}','${TIPO_SOLICITANTE}','${TELEFONO_OPCIONAL}','${DIRECCION_SOLICITANTE}','${CIUDAD}','${COD_SERVICIO}','${DESCRIPCION_SOLICITUD}''${COD_ESTADO}')`;
+            const {COD_SOLICITUD,NOMBRE,APELLIDO, TELEFONO, CORREO_ELECTRONICO, TIPO_SOLICITANTE, TELEFONO_OPCIONAL, DIRECCION_SOLICITANTE, NOMBRE_E_C,RTN_DNI, CIUDAD, COD_SERVICIO, DESCRIPCION_SOLICITUD,COD_ESTADO}= req.body
+            const consulta = `CALL PROCE_SOLICITUDES_UPDATE('${COD_SOLICITUD}','${NOMBRE}','${APELLIDO}','${TELEFONO}','${CORREO_ELECTRONICO}','${TIPO_SOLICITANTE}','${TELEFONO_OPCIONAL}','${DIRECCION_SOLICITANTE}','${NOMBRE_E_C}','${RTN_DNI}','${CIUDAD}','${COD_SERVICIO}','${DESCRIPCION_SOLICITUD}','${COD_ESTADO}')`;
     
             req.getConnection((err,conn)=>{
             conn.query(consulta,(err,rows)=>{
@@ -114,7 +114,7 @@ routes.put('/solicitudes/:COD_SOLICITUD',ensureToken, function  (req,res){
 
 //Eliminar SOLICITUD
 
-routes.delete('/solicitud/:COD_SOLICITUD',ensureToken, function  (req,res){
+routes.delete('/solicitudes/delete',ensureToken, function  (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO DENEGADO')
