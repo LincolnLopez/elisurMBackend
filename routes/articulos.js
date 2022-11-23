@@ -104,22 +104,23 @@ routes.put('/articulo/actualizar',ensureToken, function  (req,res){
 })
 
 // ELIMINAR CATEGORIA
-routes.delete('/articulo/eliminar',ensureToken, function (req,res){
+
+routes.delete('/delete_articulo',ensureToken, function  (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
-            res.send('ACCESO DENEGADO')
+            res.send('ACCESO NO PERMITIDO')
         }else{
-            const {COD_ARTICULO } = req.params
-            const consulta = `CALL PROCE_ARTICULOS_DELETE('${COD_ARTICULO }')`;
-
-             req.getConnection((err,conn)=>{
-             conn.query(consulta,[COD_ARTICULO ],(err,rows)=>{
+            const {COD_ARTICULO}= req.body
+            const consulta = `CALL PROCE_ARTICULOS_DELETE('${COD_ARTICULO}')`;
+    
+            req.getConnection((err,conn)=>{
+            conn.query(consulta,(err,rows)=>{
                 if(!err)
-                res.send('Categoria Eliminada')
+                res.send('Articulo desactivado')
                 else
-                console.log(err)
-                })
-            })
+                    console.log(err)
+                 })
+            })    
         }
     })
 })
