@@ -34,6 +34,7 @@ app.use(require('./routes/empleados'))
 app.use(require('./routes/inventarioH'))
 app.use(require('./routes/preguntas_encuesta'))
 app.use(require('./routes/reporte__fallas'))
+app.use(require('./routes/presupuesto'))
 app.use(require('./routes/login'))
 
 //server running
