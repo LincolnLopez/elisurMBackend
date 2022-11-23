@@ -104,24 +104,26 @@ routes.put('/update_cliente',ensureToken, function  (req,res){
 })
 
 // ELIMINAR CATEGORIA
-routes.delete('/cliente/eliminar',ensureToken, function (req,res){
-   jwt.verify(req.token, 'my_secret_key', (err,data)=>{
-       if(err) {
-           res.send('ACCESO DENEGADO')
-       }else{
-           const {COD_CLIENTE } = req.params
-           const consulta = `CALL PROCE_CLIENTES_DELETE('${COD_CLIENTE}')`;
 
+
+routes.delete('/cliente/eliminar',ensureToken, function  (req,res){
+    jwt.verify(req.token, 'my_secret_key', (err,data)=>{
+        if(err) {
+            res.send('ACCESO NO PERMITIDO')
+        }else{
+            const {COD_CLIENTE}= req.body
+            const consulta = `CALL PROCE_CLIENTES_DELETE('${COD_CLIENTE}')`;
+    
             req.getConnection((err,conn)=>{
-            conn.query(consulta,[COD_CLIENTE ],(err,rows)=>{
-               if(!err)
-               res.send('CLIENTE ELIMINADO')
-               else
-               console.log(err)
-               })
-           })
-       }
-   })
+            conn.query(consulta,(err,rows)=>{
+                if(!err)
+                res.send('Cliente desactivado')
+                else
+                    console.log(err)
+                 })
+            })    
+        }
+    })
 })
 
   
