@@ -36,6 +36,7 @@ app.use(require('./routes/preguntas_encuesta'))
 app.use(require('./routes/reporte__fallas'))
 app.use(require('./routes/presupuesto'))
 app.use(require('./routes/login'))
+app.use(require('./routes/bitacora_admin'))
 
 //server running
 app.listen(app.get('port'), ( )=>{
