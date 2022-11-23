@@ -65,6 +65,30 @@ routes.get('/USUARIO',ensureToken, function (req, res){
 })
 
 
+//validar usuario y password
+routes.get('/validar_usuario',ensureToken, function (req, res){
+
+    jwt.verify(req.token, 'my_secret_key', (err,data)=>{
+        if(err) {
+            res.send('ACCESO DENEGADO')
+        }else{
+            const {NOMBRE_USUARIO,PASSWORD_USUARIO} = req.body;
+            const consulta = `CALL PROCE_VALIDACION_LOGIN('${NOMBRE_USUARIO}','${PASSWORD_USUARIO}')`;
+   
+            req.getConnection((err, conn)=>{
+            conn.query(consulta, (err, rows)=>{
+                 if(!err)
+                 res.status(200).json(rows[0]);
+                 else
+                console.log(err)
+                })         
+            })
+        }
+    })
+
+})
+
+
 // INSERTAR usuarios
 routes.post('/insert_usuarios',ensureToken, function (req, res){
 
