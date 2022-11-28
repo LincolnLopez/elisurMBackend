@@ -31,10 +31,12 @@ app.use(require('./routes/clientes'))
 app.use(require('./routes/permisos'))
 app.use(require('./routes/inventario'))
 app.use(require('./routes/empleados'))
-app.use(require('./routes/inventario_herramientas'))
+app.use(require('./routes/inventarioH'))
 app.use(require('./routes/preguntas_encuesta'))
 app.use(require('./routes/reporte__fallas'))
+app.use(require('./routes/presupuesto'))
 app.use(require('./routes/login'))
+app.use(require('./routes/bitacora_admin'))
 
 //server running
 app.listen(app.get('port'), ( )=>{

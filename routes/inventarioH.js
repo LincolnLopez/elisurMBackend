@@ -33,9 +33,9 @@ routes.get('/herramientas',(req, res)=>{
 
 
  //INSERTAR Herramienta
-routes.post('/herramienta/insert',(req, res)=>{
+routes.post('/insert_herramienta',(req, res)=>{
     const {NOMBRE_HERRAMIENTA,DESCRIPCION_HERRAMIENTA,NUM_EXISTENCIA,COD_EMPLEADO} = req.body;
-    const consulta = `CALL PROCE_EMPLEADOS_INSERT('${NOMBRE_HERRAMIENTA}','${DESCRIPCION_HERRAMIENTA}','${NUM_EXISTENCIA}','${COD_EMPLEADO}')`;
+    const consulta = `CALL PROCE_INVENTARIO_HERRAMIENTAS_INSERT('${NOMBRE_HERRAMIENTA}','${DESCRIPCION_HERRAMIENTA}','${NUM_EXISTENCIA}','${COD_EMPLEADO}')`;
     
     req.getConnection((err, conn)=>{
             conn.query(consulta, (err, rows)=>{
@@ -50,13 +50,13 @@ routes.post('/herramienta/insert',(req, res)=>{
    
     
 // Actualizar   Herramienta
-routes.put('/herramienta/actualizar',ensureToken, function  (req,res){
+routes.put('/actualizar_herramienta',ensureToken, function  (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO DENEGADO')
         }else{
             const {COD_HERRAMIENTA,NOMBRE_HERRAMIENTA,DESCRIPCION_HERRAMIENTA,NUM_EXISTENCIA,COD_EMPLEADO}= req.body
-            const consulta = `CALL PROCE_EMPLEADOS_UPDATE('${COD_HERRAMIENTA}','${NOMBRE_HERRAMIENTA}','${DESCRIPCION_HERRAMIENTA}','${NUM_EXISTENCIA}','${COD_EMPLEADO}')`;
+            const consulta = `CALL PROCE_INVENTARIO_HERRAMIENTAS_UPDATE('${COD_HERRAMIENTA}','${NOMBRE_HERRAMIENTA}','${DESCRIPCION_HERRAMIENTA}','${NUM_EXISTENCIA}','${COD_EMPLEADO}')`;
     
             req.getConnection((err,conn)=>{
             conn.query(consulta,(err,rows)=>{
@@ -71,25 +71,26 @@ routes.put('/herramienta/actualizar',ensureToken, function  (req,res){
 })
 
 //Eliminar herramienta
-routes.delete('/herramienta/eliminar',ensureToken, function (req,res){
+ 
+routes.delete('/delete_herramienta',ensureToken, function  (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
-            res.send('ACCESO DENEGADO')
+            res.send('ACCESO NO PERMITIDO')
         }else{
-            const {COD_HERRAMIENTA } = req.params
-            const consulta = `CALL PROCE_INVENTARIO_HERRAMIENTAS_DELETE('${COD_HERRAMIENTA }')`;
-
-             req.getConnection((err,conn)=>{
-             conn.query(consulta,[COD_HERRAMIENTA ],(err,rows)=>{
+            const {COD_HERRAMIENTA}= req.body
+            const consulta = `CALL PROCE_INVENTARIO_HERRAMIENTAS_DELETE('${COD_HERRAMIENTA}')`;
+    
+            req.getConnection((err,conn)=>{
+            conn.query(consulta,(err,rows)=>{
                 if(!err)
-                res.send('Herramienta Eliminada')
+                res.send('HERRAMIENTA desactivada')
                 else
-                console.log(err)
-                })
-            })
+                    console.log(err)
+                 })
+            })    
         }
     })
-})  
+})
 
 // seleccionar individual herramienta
 

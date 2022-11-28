@@ -15,8 +15,12 @@ function ensureToken(req , res , next){
         res.send('ACCESO DENEGADO')
      }
   }
-// VER PERMISOS
-routes.get('/permisos', ensureToken, function (req,res){
+
+/*--------------------------------SOLICITUDES---------------------------------*/
+
+
+// Ver SOLICITUDES
+routes.get('/solicitudes', ensureToken, function (req,res){
      
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
@@ -25,8 +29,9 @@ routes.get('/permisos', ensureToken, function (req,res){
 
             req.getConnection((err,conn) =>{
                 if(err)return res.send(err)
-                conn.query('CALL PROCE_PERMISOS_SELECT', (err,rows)=>{
+                conn.query('CALL PROCE_SOLICITUDES_SELECT', (err,rows)=>{
                     if(err) return res.send(err)
+                    
                     res.status(200).json(rows[0]);
                 })
         
@@ -34,15 +39,17 @@ routes.get('/permisos', ensureToken, function (req,res){
         }
     })
 })
-//UN PERMISO
-routes.get('/permiso',ensureToken, function (req, res){
+
+
+//UNA SOLICITUD
+routes.get('/SOLICITUD',ensureToken, function (req, res){
 
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO DENEGADO')
         }else{
-            const { P_COD_PERMISO} = req.body;
-            const consulta = `CALL PROCE_CATEGORIA_SELECT_UNO('${ P_COD_PERMISO }')`;
+            const {COD_SOLICITUD} = req.body;
+            const consulta = `CALL PROCE_SOLICITUDES_SELECT_UNO('${COD_SOLICITUD }')`;
    
             req.getConnection((err, conn)=>{
             conn.query(consulta, (err, rows)=>{
@@ -58,20 +65,20 @@ routes.get('/permiso',ensureToken, function (req, res){
 })
 
 
-// INSERTAR PERMISO
-routes.post('/insert_permisos',ensureToken, function (req, res){
+// INSERTAR SOLICITUD
+routes.post('/solicitudes',ensureToken, function (req, res){
 
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO DENEGADO')
         }else{
-            const {COD_ROL,EDITAR_USUARIOS,VER_INVENTARIO,ASIGNAR_TRABAJO,CERRAR_ACTIVIDAD_ASIGNADA,SOLICITAR_PRESUPUESTO,GENERAR_REPORTES,REPORTES_FALLAS} = req.body;
-            const consulta = `CALL PROCE_PERMISO_INSERT('${COD_ROL}','${EDITAR_USUARIOS}','${VER_INVENTARIO}','${ASIGNAR_TRABAJO}','${CERRAR_ACTIVIDAD_ASIGNADA}','${SOLICITAR_PRESUPUESTO}','${GENERAR_REPORTES}','${REPORTES_FALLAS}')`;
+            const {NOMBRE_SOLICITANTE, TELEFONO, CORREO_ELECTRONICO, TIPO_SOLICITANTE, TELEFONO_OPCIONAL, DIRECCION_SOLICITANTE, CIUDAD, COD_SERVICIO, DESCRIPCION_SOLICITUD} = req.body;
+            const consulta = `CALL PROCE_SOLICITUDES_INSERT('${NOMBRE_SOLICITANTE}','${TELEFONO}','${CORREO_ELECTRONICO}','${TIPO_SOLICITANTE}','${TELEFONO_OPCIONAL}','${DIRECCION_SOLICITANTE}','${CIUDAD}','${COD_SERVICIO}','${DESCRIPCION_SOLICITUD}')`;
    
             req.getConnection((err, conn)=>{
             conn.query(consulta, (err, rows)=>{
                  if(!err)
-                res.send('PERMISO CREADO')
+                res.send('SOLICITUD CREADA')
                  else
                 console.log(err)
                 })         
@@ -81,19 +88,19 @@ routes.post('/insert_permisos',ensureToken, function (req, res){
 
 })
 
-// ACTUALIZAR PERMISO
-routes.put('/actualizar_permisos',ensureToken, function  (req,res){
+// ACTUALIZAR SOLICITUD
+routes.put('/solicitudes/:COD_SOLICITUD',ensureToken, function  (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO DENEGADO')
         }else{
-            const {COD_ROL,EDITAR_USUARIOS,VER_INVENTARIO,ASIGNAR_TRABAJO,CERRAR_ACTIVIDAD_ASIGNADA,SOLICITAR_PRESUPUESTO,GENERAR_REPORTES,REPORTES_FALLAS} = req.body;
-            const consulta = `CALL PROCE_PERMISOS_UPDATE('${COD_ROL}','${EDITAR_USUARIOS}','${VER_INVENTARIO}','${ASIGNAR_TRABAJO}','${CERRAR_ACTIVIDAD_ASIGNADA}','${SOLICITAR_PRESUPUESTO}','${GENERAR_REPORTES}','${REPORTES_FALLAS}')`;
-   
+            const {COD_SOLICITUD,NOMBRE_SOLICITANTE, TELEFONO, CORREO_ELECTRONICO, TIPO_SOLICITANTE, TELEFONO_OPCIONAL, DIRECCION_SOLICITANTE, CIUDAD, COD_SERVICIO, DESCRIPCION_SOLICITUD,COD_ESTADO}= req.body
+            const consulta = `CALL PROCE_SOLICITUDES_UPDATE('${COD_SOLICITUD}','${NOMBRE_SOLICITANTE}','${TELEFONO}','${CORREO_ELECTRONICO}','${TIPO_SOLICITANTE}','${TELEFONO_OPCIONAL}','${DIRECCION_SOLICITANTE}','${CIUDAD}','${COD_SERVICIO}','${DESCRIPCION_SOLICITUD}''${COD_ESTADO}')`;
+    
             req.getConnection((err,conn)=>{
             conn.query(consulta,(err,rows)=>{
                 if(!err)
-                res.send('PERMISO ACTUALIZADO')
+                res.send('SOLICITUD ACTUALIZADA')
                 else
                     console.log(err)
                  })
@@ -101,26 +108,33 @@ routes.put('/actualizar_permisos',ensureToken, function  (req,res){
         }
     })
 })
- //esta no se usara, solo update
-// ELIMINAR PERMISOS
-routes.delete('/eliminar_permisos',ensureToken, function (req,res){
+
+
+
+
+//Eliminar SOLICITUD
+
+routes.delete('/solicitud/:COD_SOLICITUD',ensureToken, function  (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO DENEGADO')
         }else{
-            const {COD_PERMISO} = req.params
-            const consulta = `CALL PROCE_PERMISOS_DELETE('${COD_PERMISO }')`;
-
-             req.getConnection((err,conn)=>{
-             conn.query(consulta,[COD_PERMISO ],(err,rows)=>{
+            const {COD_SOLICITUD}= req.body
+            const consulta = `CALL PROCE_SOLICITUDES_DELETE('${COD_SOLICITUD}')`;
+    
+            req.getConnection((err,conn)=>{
+            conn.query(consulta,(err,rows)=>{
                 if(!err)
-                res.send('ERMISO ELIMINADO')
+                res.send('SOLICITUD Eliminada')
                 else
-                console.log(err)
-                })
-            })
+                    console.log(err)
+                 })
+            })    
         }
     })
 })
 
-module.exports = routes
+
+
+
+module.exports = routes;

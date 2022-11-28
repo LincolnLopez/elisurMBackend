@@ -33,9 +33,9 @@ routes.get('/empleados',(req, res)=>{
 
 
  //INSERTAR Empleado
-routes.post('/empleados/insert',(req, res)=>{
-    const {DNI_EMPLEADO, NOMBRE_EMPLEADO, APELLIDOS_EMPLEADO, SEXO_EMPLEADO, ESTADO_CIVIL_EMPLEADO, EDAD_EMPLEADO, TELEFONO_EMPLEADO,CORREO_EMPLEADO} = req.body;
-    const consulta = `CALL PROCE_EMPLEADOS_INSERT('${DNI_EMPLEADO}','${NOMBRE_EMPLEADO}','${APELLIDOS_EMPLEADO}','${SEXO_EMPLEADO}','${ESTADO_CIVIL_EMPLEADO}','${ EDAD_EMPLEADO}','${TELEFONO_EMPLEADO}','${CORREO_EMPLEADO}')`;
+routes.post('/insert_empleados',(req, res)=>{
+    const {DNI_EMPLEADO, NOMBRE_EMPLEADO, APELLIDOS_EMPLEADO, SEXO_EMPLEADO, ESTADO_CIVIL_EMPLEADO, EDAD_EMPLEADO, TELEFONO, CORREO} = req.body;
+    const consulta = `CALL PROCE_EMPLEADOS_INSERT('${DNI_EMPLEADO}','${NOMBRE_EMPLEADO}','${APELLIDOS_EMPLEADO}','${SEXO_EMPLEADO}','${ESTADO_CIVIL_EMPLEADO}','${ EDAD_EMPLEADO}','${TELEFONO}','${CORREO}')`;
     
     req.getConnection((err, conn)=>{
             conn.query(consulta, (err, rows)=>{
@@ -50,13 +50,13 @@ routes.post('/empleados/insert',(req, res)=>{
    
     
 // Actualizar EMPLEADOS
-routes.put('/EMPLEADO/:COD_EMPLEADO',ensureToken, function  (req,res){
+routes.put('/actualizar_empleado',ensureToken, function  (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO DENEGADO')
         }else{
-            const {COD_EMPLEADO,DNI_EMPLEADO,NOMBRE_EMPLEADO,APELLIDOS_EMPLEADO,SEXO_EMPLEADO,ESTADO_CIVIL_EMPLEADO,EDAD_EMPLEADO,TELEFONO_EMPLEADO,CORREO_EMPLEADO}= req.body
-            const consulta = `CALL PROCE_EMPLEADOS_UPDATE('${COD_EMPLEADO}','${DNI_EMPLEADO}','${NOMBRE_EMPLEADO}','${APELLIDOS_EMPLEADO}','${SEXO_EMPLEADO}','${ESTADO_CIVIL_EMPLEADO}','${EDAD_EMPLEADO}','${TELEFONO_EMPLEADO}','${CORREO_EMPLEADO}')`;
+            const {COD_EMPLEADO,DNI_EMPLEADO, NOMBRE_EMPLEADO, APELLIDOS_EMPLEADO, SEXO_EMPLEADO, ESTADO_CIVIL_EMPLEADO, EDAD_EMPLEADO, TELEFONO, CORREO}= req.body
+            const consulta = `CALL PROCE_EMPLEADOS_UPDATE('${COD_EMPLEADO}','${DNI_EMPLEADO}','${NOMBRE_EMPLEADO}','${APELLIDOS_EMPLEADO}','${SEXO_EMPLEADO}','${ESTADO_CIVIL_EMPLEADO}','${EDAD_EMPLEADO}','${TELEFONO}','${CORREO}')`;
     
             req.getConnection((err,conn)=>{
             conn.query(consulta,(err,rows)=>{
@@ -71,25 +71,26 @@ routes.put('/EMPLEADO/:COD_EMPLEADO',ensureToken, function  (req,res){
 })
 
 //Eliminar persona
-routes.delete('/empleado/:COD_EMPLEADO',ensureToken, function (req,res){
+routes.delete('/eliminar_empleados',ensureToken, function  (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
-            res.send('ACCESO DENEGADO')
+            res.send('ACCESO NO PERMITIDO')
         }else{
-            const {COD_EMPLEADO} = req.params
+            const {COD_EMPLEADO}= req.body
             const consulta = `CALL PROCE_EMPLEADOS_DELETE('${COD_EMPLEADO}')`;
-
-             req.getConnection((err,conn)=>{
-             conn.query(consulta,[COD_EMPLEADO],(err,rows)=>{
+    
+            req.getConnection((err,conn)=>{
+            conn.query(consulta,(err,rows)=>{
                 if(!err)
-                res.send('Empleado Eliminado')
+                res.send('Empleado desactivado')
                 else
-                console.log(err)
-                })
-            })
+                    console.log(err)
+                 })
+            })    
         }
     })
-})  
+})
+
 
 // seleccionar individual 
 
