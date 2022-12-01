@@ -70,26 +70,6 @@ routes.put('/FALLA/:COD_FALLA',ensureToken, function  (req,res){
     })
 })
 
-//Eliminar falla
-routes.delete('/fallas/:COD_REPORTE_FALLA',ensureToken, function (req,res){
-    jwt.verify(req.token, 'my_secret_key', (err,data)=>{
-        if(err) {
-            res.send('ACCESO DENEGADO')
-        }else{
-            const {COD_REPORTE_FALLA} = req.params
-            const consulta = `CALL PROCE_REPORTE_FALLAS_DELETE('${COD_REPORTE_FALLA}')`;
-
-             req.getConnection((err,conn)=>{
-             conn.query(consulta,[COD_REPORTE_FALLA],(err,rows)=>{
-                if(!err)
-                res.send('Reporte Eliminado')
-                else
-                console.log(err)
-                })
-            })
-        }
-    })
-})  
 
 // seleccionar individual 
 
@@ -120,9 +100,49 @@ routes.get('/FALLA',ensureToken, function (req, res){
 
 
 
+//Eliminar falla
+routes.delete('/fallas/delete',ensureToken, function  (req,res){
+    jwt.verify(req.token, 'my_secret_key', (err,data)=>{
+        if(err) {
+            res.send('ACCESO DENEGADO')
+        }else{
+            const {COD_REPORTE_FALLA}= req.body
+            const consulta = `call PROCE_REPORTE_FALLAS_DELETE('${COD_REPORTE_FALLA}')`;
+    
+            req.getConnection((err,conn)=>{
+            conn.query(consulta,(err,rows)=>{
+                if(!err)
+                res.send(' Eliminada')
+                else
+                    console.log(err)
+                 })
+            })    
+        }
+    })
+})
 
 
 
+
+routes.delete('/fallas/proceso',ensureToken, function  (req,res){
+    jwt.verify(req.token, 'my_secret_key', (err,data)=>{
+        if(err) {
+            res.send('ACCESO DENEGADO')
+        }else{
+            const {COD_REPORTE_FALLA}= req.body
+            const consulta = `call PROCE_REPORTE_FALLAS_PROCESO('${COD_REPORTE_FALLA}')`;
+    
+            req.getConnection((err,conn)=>{
+            conn.query(consulta,(err,rows)=>{
+                if(!err)
+                res.send(' Eliminada')
+                else
+                    console.log(err)
+                 })
+            })    
+        }
+    })
+})
 
 
 
