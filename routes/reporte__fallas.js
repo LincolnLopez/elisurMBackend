@@ -49,8 +49,8 @@ routes.post('/falla/insert',(req, res)=>{
 
    
     
-// Actualizar EMPLEADOS
-routes.put('/FALLA/:COD_FALLA',ensureToken, function  (req,res){
+// Actualizar REPORTE DALLA
+routes.put('/falla_Update',ensureToken, function  (req,res){
     jwt.verify(req.token, 'my_secret_key', (err,data)=>{
         if(err) {
             res.send('ACCESO DENEGADO')
@@ -130,7 +130,7 @@ routes.delete('/fallas/proceso',ensureToken, function  (req,res){
             res.send('ACCESO DENEGADO')
         }else{
             const {COD_REPORTE_FALLA}= req.body
-            const consulta = `call PROCE_REPORTE_FALLAS_PROCESO('${COD_REPORTE_FALLA}')`;
+            const consulta = `call PROCE_REPORTE_FALLAS_PRO('${COD_REPORTE_FALLA}')`;
     
             req.getConnection((err,conn)=>{
             conn.query(consulta,(err,rows)=>{
