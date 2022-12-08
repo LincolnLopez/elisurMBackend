@@ -55,8 +55,8 @@ routes.put('/falla_Update',ensureToken, function  (req,res){
         if(err) {
             res.send('ACCESO DENEGADO')
         }else{
-            const {COD_REPORTE_FALLA,COD_SERVICIO, NOMBRE, TELEFONO, CORREO_ELECTRONICO, TEMA, DESCRIPCION, UBICACION, COD_ESTADO}= req.body
-            const consulta = `CALL PROCE_REPORTE_FALLAS_UPDATE('${COD_REPORTE_FALLA}','${COD_SERVICIO}','${NOMBRE}','${TELEFONO}','${CORREO_ELECTRONICO}','${TEMA}','${DESCRIPCION}','${UBICACION}','${COD_ESTADO}')`;
+            const {COD_REPORTE_FALLA,COD_SERVICIO, NOMBRE, TELEFONO, CORREO_ELECTRONICO, TEMA, DESCRIPCION, UBICACION, COD_ESTADO,NOMBRE_EMPLEADO}= req.body
+            const consulta = `CALL PROCE_REPORTE_FALLAS_UPDATE('${COD_REPORTE_FALLA}','${COD_SERVICIO}','${NOMBRE}','${TELEFONO}','${CORREO_ELECTRONICO}','${TEMA}','${DESCRIPCION}','${UBICACION}','${COD_ESTADO}','${NOMBRE_EMPLEADO}')`;
     
             req.getConnection((err,conn)=>{
             conn.query(consulta,(err,rows)=>{
