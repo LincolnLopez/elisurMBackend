@@ -34,8 +34,8 @@ routes.get('/empleados',(req, res)=>{
 
  //INSERTAR Empleado
 routes.post('/insert_empleados',(req, res)=>{
-    const {DNI_EMPLEADO, NOMBRE_EMPLEADO, APELLIDOS_EMPLEADO, SEXO_EMPLEADO, ESTADO_CIVIL_EMPLEADO, EDAD_EMPLEADO, TELEFONO, CORREO} = req.body;
-    const consulta = `CALL PROCE_EMPLEADOS_INSERT('${DNI_EMPLEADO}','${NOMBRE_EMPLEADO}','${APELLIDOS_EMPLEADO}','${SEXO_EMPLEADO}','${ESTADO_CIVIL_EMPLEADO}','${ EDAD_EMPLEADO}','${TELEFONO}','${CORREO}')`;
+    const {DNI_EMPLEADO, NOMBRE_EMPLEADO, SEXO_EMPLEADO, ESTADO_CIVIL_EMPLEADO, EDAD_EMPLEADO, TELEFONO, CORREO} = req.body;
+    const consulta = `CALL PROCE_EMPLEADOS_INSERT('${DNI_EMPLEADO}','${NOMBRE_EMPLEADO}','${SEXO_EMPLEADO}','${ESTADO_CIVIL_EMPLEADO}','${ EDAD_EMPLEADO}','${TELEFONO}','${CORREO}')`;
     
     req.getConnection((err, conn)=>{
             conn.query(consulta, (err, rows)=>{
@@ -55,8 +55,8 @@ routes.put('/actualizar_empleado',ensureToken, function  (req,res){
         if(err) {
             res.send('ACCESO DENEGADO')
         }else{
-            const {COD_EMPLEADO,DNI_EMPLEADO, NOMBRE_EMPLEADO, APELLIDOS_EMPLEADO, SEXO_EMPLEADO, ESTADO_CIVIL_EMPLEADO, EDAD_EMPLEADO, TELEFONO, CORREO}= req.body
-            const consulta = `CALL PROCE_EMPLEADOS_UPDATE('${COD_EMPLEADO}','${DNI_EMPLEADO}','${NOMBRE_EMPLEADO}','${APELLIDOS_EMPLEADO}','${SEXO_EMPLEADO}','${ESTADO_CIVIL_EMPLEADO}','${EDAD_EMPLEADO}','${TELEFONO}','${CORREO}')`;
+            const {COD_EMPLEADO,DNI_EMPLEADO, NOMBRE_EMPLEADO, SEXO_EMPLEADO, ESTADO_CIVIL_EMPLEADO, EDAD_EMPLEADO, TELEFONO, CORREO}= req.body
+            const consulta = `CALL PROCE_EMPLEADOS_UPDATE('${COD_EMPLEADO}','${DNI_EMPLEADO}','${NOMBRE_EMPLEADO}','${SEXO_EMPLEADO}','${ESTADO_CIVIL_EMPLEADO}','${EDAD_EMPLEADO}','${TELEFONO}','${CORREO}')`;
     
             req.getConnection((err,conn)=>{
             conn.query(consulta,(err,rows)=>{
